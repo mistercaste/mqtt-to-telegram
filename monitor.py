@@ -4,15 +4,15 @@ import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
 
 # Environment variables
-TOKEN = os.getenv('TELEGRAM_TOKEN')
-CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 MQTT_BROKER = os.getenv('MQTT_BROKER', 'localhost')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
 MQTT_TOPIC = os.getenv('MQTT_TOPIC', 'security/#')
 MQTT_USER = os.getenv('MQTT_USER')
 MQTT_PASS = os.getenv('MQTT_PASS')
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
@@ -26,7 +26,7 @@ def on_message(client, userdata, msg):
     message_text = f"INFO - MQTT message found.\n\tTopic: {msg.topic}\n\tMessage: {payload}"
     print(f"INFO - Message received: {payload}")
     try:
-        bot.send_message(CHAT_ID, message_text, parse_mode='Markdown')
+        bot.send_message(TELEGRAM_CHAT_ID, message_text, parse_mode='Markdown')
     except Exception as e:
         print(f"ERROR - Sending to Telegram: {e}")
 
