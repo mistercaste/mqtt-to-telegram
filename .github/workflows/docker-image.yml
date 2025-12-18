@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Release and Push Docker Image
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ secrets.DOCKER_USER }}/mqtt-telegram-security
+        images: ${{ secrets.DOCKER_USER }}/mqtt-to-telegram
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
