@@ -46,3 +46,4 @@ mosquitto_pub \
         -t "telegram/helloworld" \                                                                                                
         -m "Your installation of mqtt-to-telegram works!" 
 ```
+If everything works fine, you should receive a message in your phone's Telegram.
