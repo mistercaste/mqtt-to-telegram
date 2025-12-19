@@ -11,8 +11,8 @@ MQTT_BROKER = os.getenv('MQTT_BROKER', 'localhost')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
 MQTT_USER = os.getenv('MQTT_USER')
 MQTT_PASS = os.getenv('MQTT_PASS')
-MQTT_TOPIC_OUTPUT = os.getenv('MQTT_TOPIC', 'telegram/output/#')
-MQTT_TOPIC_INPUT = os.getenv('MQTT_TOPIC', 'telegram/input/#')
+MQTT_TOPIC_OUTPUT = os.getenv('MQTT_TOPIC_OUTPUT', 'telegram/output/#')
+MQTT_TOPIC_INPUT = os.getenv('MQTT_TOPIC_INPUT', 'telegram/input')
 
 bot = telebot.TeleBot(TOKEN)
 
