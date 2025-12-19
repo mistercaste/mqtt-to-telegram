@@ -31,10 +31,10 @@ Important: Now open a chat with your new bot (the one you created in step 1) and
       - TELEGRAM_CHAT_ID=your_chat_id
       - MQTT_BROKER=192.168...
       - MQTT_PORT=1883
-      - MQTT_TOPIC_OUTPUT=telegram/output/#    # Monitors all sub-topics
-      - MQTT_TOPIC_INPUT=telegram/input/#    # Monitors all sub-topics
       - MQTT_USER=my_username
       - MQTT_PASS=********
+      - MQTT_TOPICS_OUTPUT=telegram/output/#,mt32/#    # Monitors multiple topics and their sub-topics
+      - MQTT_TOPIC_INPUT=telegram/input/#    # Monitors all sub-topics
 ```
 
 ## Testing
@@ -50,7 +50,7 @@ mosquitto_pub \
         -u ${MQTT_USERNAME} \                                                                                                               
         -P ${MQTT_PASSWORD} \                                                                                                               
         -t "telegram/output" \                                                                                                
-        -m "MQTT to Telegram works fine!" 
+        -m "MQTT to Telegram works fine!" # If this is a LINK to an image file, such an image will be sent to Telegram 
 ```
 If everything works fine, you should receive a message in your phone's Telegram.
 
