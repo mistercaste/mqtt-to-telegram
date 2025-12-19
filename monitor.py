@@ -51,7 +51,7 @@ def handle_telegram_message(message):
         result = mqtt_client.publish(MQTT_TOPIC_INPUT, payload)
         
         if result.rc == mqtt.MQTT_ERR_SUCCESS:
-            bot.reply_to(message, f"INFO - Sent to MQTT on `{MQTT_TOPIC_INPUT}`")
+            bot.reply_to(message, f"Sent to `{MQTT_TOPIC_INPUT}`")
         else:
             bot.reply_to(message, "ERROR - An error occurred while publishing to MQTT")
     else:
