@@ -36,32 +36,38 @@ def on_connect(client, userdata, flags, rc, properties=None):
 def on_message(client, userdata, msg):
     payload = msg.payload.decode().strip()
     print(f"INFO - From MQTT [{msg.topic}]: {payload}")
+
     try:
-        # If the MQTT payload contains a link to an image
-        if IMAGE_URL_PATTERN.match(payload):
+        match = IMAGE_URL_PATTERN.match(payload)
+        if match:
+            # Extract the original image file extension ('png', 'jpg'...)
+            ext = match.group(1).lower()
             caption = f"Topic: {msg.topic}"
             
-            print(f"INFO - Loading image . . .")
-            response = requests.get(payload, timeout=10)
-            if response.status_code == 200:
-                photo = io.BytesIO(response.content)
-                photo.name = 'snapshot.jpg'
-                bot.send_photo(CHAT_ID, photo, caption=caption)
-                print(f"INFO - Image sent successfully")
-            else:
-                print(f"ERROR - Impossible to download local image: {response.status_code}")
+            print(f"INFO - Downloading ({ext}) image . . .")
+            
+            # Use a context manager (with) to handle the HTTP request
+            with requests.get(payload, timeout=15, stream=True) as response:
+                response.raise_for_status()
+                
+                # Use BytesIO to load the image in memory
+                with io.BytesIO(response.content) as photo_buffer:
+                    photo_buffer.name = f"snapshot.{ext}"                    
+                    bot.send_photo(CHAT_ID, photo_buffer, caption=caption)
+                    print(f"INFO - Immagine {photo_buffer.name} inviata con successo")            
+            # Note on memory usage: once outside the 'with' the buffer gets automatically garbage collected                
         else:
             message_text = f"Topic: {msg.topic}\nMessage: {payload}"
             bot.send_message(CHAT_ID, message_text, parse_mode='Markdown')
-            print(f"INFO - Message sent to Telegram")            
+            print(f"INFO - Message sent to Telegram")
+            
     except Exception as e:
-        print(f"ERROR - Impossible to send to Telegram: {e}")
+        print(f"ERROR - Errore durante l'invio o il download: {e}")
 
 # MQTT client initialization
 mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2)
 if MQTT_USER and MQTT_PASS:
     mqtt_client.username_pw_set(MQTT_USER, MQTT_PASS)
-
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 
