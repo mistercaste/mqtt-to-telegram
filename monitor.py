@@ -38,7 +38,7 @@ def on_message(client, userdata, msg):
     try:
         # If the MQTT payload contains a link to an image
         if IMAGE_URL_PATTERN.match(payload):
-            caption = f"INFO - New image\nTopic: {msg.topic}"
+            caption = f"Topic: {msg.topic}"
             bot.send_photo(CHAT_ID, payload, caption=caption, parse_mode='Markdown')
             print(f"INFO - Image sent to Telegram")
         else:
@@ -65,7 +65,7 @@ def handle_telegram_message(message):
         payload = message.text
         result = mqtt_client.publish(MQTT_TOPIC_INPUT, payload)
         if result.rc == mqtt.MQTT_ERR_SUCCESS:
-            bot.reply_to(message, "INFO - Sent to MQTT")
+            bot.reply_to(message, f"Sent to `{MQTT_TOPIC_INPUT}`")
         else:
             bot.reply_to(message, "ERROR - An error occurred while publishing to MQTT")
 
