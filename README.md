@@ -38,28 +38,31 @@ Important: Now open a chat with your new bot (the one you created in step 1) and
 ```
 
 ## Testing MQTT
-In order to test from the command line your setup, you will need to `apt install mosquitto-clients`.
+In order to test from the command line your setup, you will need some toolset.
+Please install it with `apt install mosquitto-clients`.
 
-A. To test the setup by sending a manual message to the MQTT broker, run:
- ```
- mosquitto_pub \                                                                                                                        
-         -h ${SERVER} \                                                                                                                 
-         -p 1883 \                                                                                                                      
-         -u ${USERNAME} \                                                                                                               
-         -P ${PASSWORD} \                                                                                                               
-         -t "telegram/output/helloworld" \                                                                                                
-         -m "Your installation of mqtt-to-telegram works!" 
- ```
- If everything works fine, you should receive a message in your phone's Telegram.
+### MQTT to Telegram
+To test the setup by sending a manual message to the MQTT broker, run:
+```
+mosquitto_pub \                                                                                                                        
+        -h ${SERVER} \                                                                                                                 
+        -p 1883 \                                                                                                                      
+        -u ${USERNAME} \                                                                                                               
+        -P ${PASSWORD} \                                                                                                               
+        -t "telegram/output/helloworld" \                                                                                                
+        -m "Your installation of mqtt-to-telegram works!" 
+```
+If everything works fine, you should receive a message in your phone's Telegram.
 
-B. To test the other direction, please run the command below, and write something in your Telegram Bot:
- ```
- mosquitto_sub \                                                                                                                        
-         -h ${SERVER} \                                                                                                                 
-         -p 1883 \                                                                                                                      
-         -u ${USERNAME} \                                                                                                               
-         -P ${PASSWORD} \                                                                                                               
-         -t "telegram/input/"
- ```
- If everything works fine, you should read your Telegram message in the topic-subscriber.
+### Telegram to MQTT
+To test the other direction, please run the command below, and write something in your Telegram Bot:
+```
+mosquitto_sub \                                                                                                                        
+        -h ${SERVER} \                                                                                                                 
+        -p 1883 \                                                                                                                      
+        -u ${USERNAME} \                                                                                                               
+        -P ${PASSWORD} \                                                                                                               
+        -t "telegram/input/"
+```
+If everything works fine, you should read your Telegram message in the topic-subscriber.
 
