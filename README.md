@@ -1,10 +1,10 @@
 # mqtt-to-telegram
 A container providing full-duplex communication between MQTT (topics) and Telegram.
 
-## Telegram BOT
+## Setup Telegram
 To allow the container connecting to your Telegram, you need to get some references from the communication app.
 
-### Telgram - Creating the Bot (Getting the Token)
+### Telgram - Create Bot (Token)
 The "father" of all bots is @BotFather. Follow these steps within the Telegram app:
   * Search for **@BotFather** in the Telegram search bar and start the conversation.
   * Type or click the `/newbot` command.
@@ -12,7 +12,7 @@ The "father" of all bots is @BotFather. Follow these steps within the Telegram a
   * Username: Choose a unique username that must end with "bot" (e.g., `mqtt_to_telegram_bot`).
   * Token: BotFather will reply with a message containing the **HTTP API Token** (a string similar to `123456789:ABCdefGhI_jklmNoP`). Save it, as it is the key to controlling the bot.
 
-### Telegram - Getting your Chat ID
+### Telegram - Get Chat ID
 The bot needs to know who to send messages to. The `Chat ID` is the unique numeric code for your account.
   * Search for the @userinfobot bot on Telegram and click "Start."
   * It will immediately respond with your ID (a number, e.g., `987654321`).
@@ -37,7 +37,7 @@ Important: Now open a chat with your new bot (the one you created in step 1) and
       - MQTT_PASS=********
 ```
 
-## Testing MQTT
+## Testing
 In order to test from the command line your setup, you will need some toolset.
 Please install it with `apt install mosquitto-clients`.
 
@@ -65,4 +65,3 @@ mosquitto_sub \
         -t "telegram/input/"
 ```
 If everything works fine, you should read your Telegram message in the topic-subscriber.
-
