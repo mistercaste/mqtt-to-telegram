@@ -131,7 +131,7 @@ def send_security_alert(message: str):
         try:
             bot.send_message(
                 uid,
-                f"🚨 *SECURITY ALERT*\n{message}",
+                f"SECURITY ALERT: [{message}]",
                 parse_mode="Markdown"
             )
         except Exception:
