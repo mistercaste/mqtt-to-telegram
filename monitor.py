@@ -66,6 +66,15 @@ logger.info(
     f"Rate limit: {RATE_LIMIT_MESSAGES} messages / {RATE_LIMIT_WINDOW}s per user"
 )
 
+# Enable Telegram notification in case of attacks from unauthorized users (anything not true/1/yes/on will be considered false)
+TELEGRAM_SECURITY_ALERT_CHANNEL = os.getenv(
+    "TELEGRAM_SECURITY_ALERT_CHANNEL", "false"
+).lower() in ("1", "true", "yes", "on")
+
+logger.info(
+    f"Telegram security alert channel enabled: {TELEGRAM_SECURITY_ALERT_CHANNEL}"
+)
+
 # ------------------------------------------------------------------------------
 # Safety checks
 # ------------------------------------------------------------------------------
@@ -86,6 +95,28 @@ IMAGE_URL_PATTERN = re.compile(
     r"^https?://.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$",
     re.IGNORECASE
 )
+
+# ------------------------------------------------------------------------------
+# Telegram notification function for security alerts
+# ------------------------------------------------------------------------------
+
+def send_security_alert(message: str):
+    if not TELEGRAM_SECURITY_ALERT_CHANNEL:
+        return
+
+    logger.warning(f"SECURITY ALERT SENT | {message}")
+
+    for user_id in ALLOWED_USER_IDS:
+        try:
+            bot.send_message(
+                user_id,
+                f"🚨 *SECURITY ALERT*\n{message}",
+                parse_mode="Markdown"
+            )
+        except Exception:
+            logger.exception(
+                f"Failed to send security alert | user_id={user_id}"
+            )
 
 # ------------------------------------------------------------------------------
 # Authorization + Rate limit
@@ -129,7 +160,9 @@ def is_user_allowed(message) -> bool:
     user_id = message.from_user.id
 
     if user_id not in ALLOWED_USER_IDS:
-        logger.warning(f"Unauthorized Telegram user blocked | user_id={user_id}")
+        alert_msg = f"Unauthorized Telegram user blocked | user_id={user_id}"
+        logger.warning(alert_msg)
+        send_security_alert(alert_msg)
         return False
 
     if is_rate_limited(user_id):
