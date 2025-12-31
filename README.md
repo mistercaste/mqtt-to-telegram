@@ -25,7 +25,8 @@ Important: Now open a chat with your new bot (the one you created in step 1) and
   mqtt-to-telegram:                                                                                                             
     container_name: mqtt-to-telegram                                                                                            
     image: mistercaste/mqtt-to-telegram:latest                                                                                   
-    restart: unless-stopped                                                                                                           
+    restart: unless-stopped
+    network_mode: host                                                                                                           
     environment:                                                                                                                      
       - TELEGRAM_TOKEN=your_token
       - TELEGRAM_CHAT_ID=your_chat_id
