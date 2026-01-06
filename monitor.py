@@ -9,6 +9,7 @@ import io
 import logging
 import sys
 import time
+import html
 
 # ==============================================================================
 # Logging (Docker-friendly)
@@ -34,6 +35,13 @@ def get_logger(name: str) -> logging.Logger:
 logger = get_logger("telegram-mqtt-bridge")
 
 # ==============================================================================
+# Utils
+# ==============================================================================
+
+def escape_html(text: str) -> str:
+    return html.escape(text, quote=False)
+
+# ==============================================================================
 # Environment variables
 # ==============================================================================
 
@@ -55,6 +63,11 @@ ALLOWED_USER_IDS = {
     for uid in os.getenv("TELEGRAM_ALLOWED_USER_IDS", "").split(",")
     if uid.strip().isdigit()
 }
+
+# Security alerts
+DEBUG_MODE = os.getenv(
+    "DEBUG", "false"
+).lower() in ("1", "true", "yes", "on")
 
 # Rate limit
 RATE_LIMIT_MESSAGES = int(os.getenv("RATE_LIMIT_MESSAGES", 5))
@@ -98,7 +111,7 @@ IMAGE_URL_PATTERN = re.compile(
 # Rate limit + Authorization
 # ==============================================================================
 
-rate_limit_state = {}  # user_id -> {count, window_start}
+rate_limit_state = {}
 
 def is_rate_limited(user_id: int) -> bool:
     now = time.time()
@@ -126,13 +139,14 @@ def send_security_alert(message: str):
         return
 
     logger.warning(f"SECURITY ALERT SENT | {message}")
+    alert = escape_html(message)
 
     for uid in ALLOWED_USER_IDS:
         try:
             bot.send_message(
                 uid,
-                f"SECURITY ALERT: [{message}]",
-                parse_mode="Markdown"
+                f"<b>SECURITY ALERT</b>\n<code>{alert}</code>",
+                parse_mode="HTML"
             )
         except Exception:
             logger.exception(f"Failed to send security alert | user_id={uid}")
@@ -189,7 +203,11 @@ def on_message(client, userdata, msg):
 
         if match:
             ext = match.group(1).lower()
-            caption = f"Topic: {msg.topic}"
+            
+            if DEBUG_MODE :
+                caption = escape_html(f"Topic: {msg.topic}")
+            else :
+                caption = f""
 
             with requests.get(payload, timeout=15) as response:
                 response.raise_for_status()
@@ -201,20 +219,29 @@ def on_message(client, userdata, msg):
                         send_to_allowed_users(
                             bot.send_animation,
                             photo_buffer,
-                            caption=caption
+                            caption=f"<b>{caption}</b>",
+                            parse_mode="HTML"
                         )
                     else:
                         send_to_allowed_users(
                             bot.send_photo,
                             photo_buffer,
-                            caption=caption
+                            caption=f"<b>{caption}</b>",
+                            parse_mode="HTML"
                         )
         else:
-            message_text = f"Topic: {msg.topic}\nMessage: {payload}"
+            topic = escape_html(msg.topic)
+            payload_escaped = escape_html(payload)
+
+            message_text = (
+                f"<b>Topic:</b> <code>{topic}</code>\n"
+                f"<b>Message:</b>\n<pre>{payload_escaped}</pre>"
+            )
+
             send_to_allowed_users(
                 bot.send_message,
                 message_text,
-                parse_mode="Markdown"
+                parse_mode="HTML"
             )
 
     except requests.exceptions.ConnectionError as e:
@@ -256,13 +283,25 @@ def handle_telegram_message(message):
     payload = message.text
     result = mqtt_client.publish(MQTT_TOPIC_INPUT, payload)
 
+    topic = escape_html(MQTT_TOPIC_INPUT)
+
     if result.rc == mqtt.MQTT_ERR_SUCCESS:
-        bot.reply_to(message, f"Sent to `{MQTT_TOPIC_INPUT}`")
+        
+        if DEBUG_MODE :
+            bot.reply_to(
+                message,
+                f"Sent to <code>{topic}</code>",
+                parse_mode="HTML"
+            )
         logger.info(
             f"Telegram → MQTT | user_id={message.from_user.id} | topic={MQTT_TOPIC_INPUT}"
         )
     else:
-        bot.reply_to(message, "ERROR - Publishing to MQTT failed")
+        bot.reply_to(
+            message,
+            "<b>ERROR</b> – Publishing to MQTT failed",
+            parse_mode="HTML"
+        )
         logger.error(
             f"MQTT publish failed | user_id={message.from_user.id}"
         )
@@ -272,7 +311,7 @@ def handle_telegram_message(message):
 # ==============================================================================
 
 if __name__ == "__main__":
-    logger.info("Starting Telegram ↔ MQTT secure bridge (rate-limit + alerts enabled)")
+    logger.info("Starting Telegram ↔ MQTT secure bridge (HTML mode)")
 
     mqtt_thread = threading.Thread(target=run_mqtt, daemon=True)
     mqtt_thread.start()
