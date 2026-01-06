@@ -134,7 +134,7 @@ def is_rate_limited(user_id: int) -> bool:
     return False
 
 
-def send_security_alert(message: str):
+def send_security_alert( str):
     if not TELEGRAM_SECURITY_ALERT_CHANNEL:
         return
 
@@ -235,8 +235,8 @@ def on_message(client, userdata, msg):
 
             if DEBUG_MODE :
                 message_text = (
+                    f"<pre>{payload_escaped}</pre>"
                     f"<b>Topic:</b> <code>{topic}</code>\n"
-                    f"<b>Message:</b>\n<pre>{payload_escaped}</pre>"
                 )
             else :
                 message_text = (
