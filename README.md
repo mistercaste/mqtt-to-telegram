@@ -89,3 +89,81 @@ mosquitto_sub \
         -t "telegram/input"
 ```
 If everything works fine, you should read your Telegram message in the topic-subscriber, and have a message `Sent to telegram/input` in your Telegram chat.
+
+### Test Message Samples
+
+1. Basic test:
+
+```
+System online
+```
+
+Expected output:
+
+```
+System online
+```
+
+2. Dangerous HTML characters
+
+```
+Temperature < 20°C & rising > expected
+```
+
+Expected output:
+
+```
+Temperature < 20°C & rising > expected
+```
+
+3. Multiline payload
+
+```
+Line 1
+Line 2
+Line 3
+```
+
+Expected output:
+
+```
+Line 1
+Line 2
+Line 3
+```
+
+4. Compact JSON
+
+```
+{"sensor":"temp","value":21.5,"unit":"C"}
+```
+
+Expected output:
+
+```
+{"sensor":"temp","value":21.5,"unit":"C"}
+```
+
+5. Simulate alert logs
+
+```
+[WARN] Disk usage at 92% on /dev/sda1
+```
+
+Expected output:
+
+```
+[WARN] Disk usage at 92% on /dev/sda1
+```
+
+6. Stress test HTML
+
+```
+</pre><b>HACK</b>&<script>alert(1)</script>
+```
+
+Expected output:
+
+```
+</pre><b>HACK</b>&<script>alert(1)</script>
+```
