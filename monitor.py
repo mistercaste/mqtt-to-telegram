@@ -233,10 +233,15 @@ def on_message(client, userdata, msg):
             topic = escape_html(msg.topic)
             payload_escaped = escape_html(payload)
 
-            message_text = (
-                f"<b>Topic:</b> <code>{topic}</code>\n"
-                f"<b>Message:</b>\n<pre>{payload_escaped}</pre>"
-            )
+            if DEBUG_MODE :
+                message_text = (
+                    f"<b>Topic:</b> <code>{topic}</code>\n"
+                    f"<b>Message:</b>\n<pre>{payload_escaped}</pre>"
+                )
+            else :
+                message_text = (
+                    f"<pre>{payload_escaped}</pre>"
+                )
 
             send_to_allowed_users(
                 bot.send_message,
